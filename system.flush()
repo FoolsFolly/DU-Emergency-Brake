@@ -4,6 +4,7 @@
 -- Anti Crash
 if hover.distance() > 0 and vec3(core.getWorldVelocity()):len() > 13 and vec3(core.getWorldVelocity()):dot(-vec3(core.getWorldVertical())) < -10  then
     finalBrakeInput = 1 --Hit the brakes
+    unit.activateGroundEngineAltitudeStabilization(35)
     local currentPitchDeg = getRoll(worldVertical, constructRight, -constructForward) --Figure out current pitch
     targetAngularVelocity = (0-currentPitchDeg)/10 * pitchSpeedFactor * constructRight --Level out
         + finalRollInput * rollSpeedFactor * constructForward
