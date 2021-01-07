@@ -1,12 +1,12 @@
---Inject the following to the System slot, flush() filter. Somewhere below Rotation but above Engine Commands.
+--Inject the following to the System slot, flush() filter. Somewhere below Axis but above Rotation.
 
 
 -- Anti Crash
-if hover.distance() > 0 and vec3(core.getWorldVelocity()):len() > 13 and vec3(core.getWorldVelocity()):dot(-vec3(core.getWorldVertical())) < -10  then
+if hover.distance() > 0 and unit.getAtmosphereDensity() > 0.0 and vec3(core.getWorldVelocity()):len() > 13 and vec3(core.getWorldVelocity()):dot(-vec3(core.getWorldVertical())) < -10  then
     finalBrakeInput = 1 --Hit the brakes
-    unit.activateGroundEngineAltitudeStabilization(35)
-    local currentPitchDeg = getRoll(worldVertical, constructRight, -constructForward) --Figure out current pitch
-    targetAngularVelocity = (0-currentPitchDeg)/10 * pitchSpeedFactor * constructRight --Level out
-        + finalRollInput * rollSpeedFactor * constructForward
-        + finalYawInput * yawSpeedFactor * constructUp
+    if unit.computeGroundEngineAltitudeStabilizationCapabilities()[2] >= hover.distance() then
+    unit.setEngineThrust('thrust', 0) --Stop forward thrust
+    unit.activateGroundEngineAltitudeStabilization(unit.computeGroundEngineAltitudeStabilizationCapabilities()[2]) --Set Altitude
+    end
+    finalPitchInput = -getRoll(worldVertical, constructRight, -constructForward)/10 --Level out, by setting pitch input to the negative of the current pitch. Divide by 10 to prevent excessive torque.
 end
