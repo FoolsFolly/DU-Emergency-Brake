@@ -2,11 +2,17 @@
 
 
 -- Anti Crash
-if hover.distance() > 0 and unit.getAtmosphereDensity() > 0.0 and vec3(core.getWorldVelocity()):len() > 13 and vec3(core.getWorldVelocity()):dot(-vec3(core.getWorldVertical())) < -10  then
-    finalBrakeInput = 1 --Hit the brakes
-    if unit.computeGroundEngineAltitudeStabilizationCapabilities()[2] >= hover.distance() then
-    unit.setEngineThrust('thrust', 0) --Stop forward thrust
+if hover.distance() > 0 and unit.getAtmosphereDensity() > 0.0 and vec3(core.getWorldVelocity()):len() > 13 and vec3(core.getWorldVelocity()):dot(-vec3(core.getWorldVertical())) < -10 or override then
+    if not override then
+    override = 1
     unit.activateGroundEngineAltitudeStabilization(unit.computeGroundEngineAltitudeStabilizationCapabilities()[2]) --Set Altitude
+    system.print("Dangerous flying detected. Override engaged.")
     end
+    finalBrakeInput = 1 --Hit the brakes
+    unit.setEngineThrust('thrust', 0) --Stop forward thrust
     finalPitchInput = -getRoll(worldVertical, constructRight, -constructForward)/10 --Level out, by setting pitch input to the negative of the current pitch. Divide by 10 to prevent excessive torque.
+    if getRoll(worldVertical, constructRight, -constructForward) < 0.5 and vec3(core.getWorldVelocity()):len() < 0.5 then --if pitch and speed are stable, end override
+     override = nil
+     system.print("Ship is stable. Override terminated.")
+    end
 end
